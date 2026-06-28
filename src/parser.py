@@ -1,7 +1,9 @@
 import time
 import requests
 import pandas as pd
+import logging
 
+logging.basicConfig(filename='../scraper.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 TARGET_URL = "https://www.otodom.pl/_next/data/Jar5lZW7hsz3OyHbE0mIz/pl/wyniki/wynajem/mieszkanie/wielkopolskie/poznan.json"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
@@ -9,34 +11,38 @@ HEADERS = {
 }
 
 def scrape_poznan_rent():
-    print("Starting scraper...")
+    logging.info("Starting scraper...")
 
     all_scraped_data = []
 
     first_page_json = fetch_page_data(TARGET_URL, 1, HEADERS)
     if not first_page_json:
-        print("Could not fetch page 1. Exiting.")
+        logging.error("Could not fetch page 1. Exiting.")
         return
 
     total_pages = first_page_json['pageProps']['data']['searchAds']['pagination'].get('totalPages', 1)
-    print(f"Found {total_pages} total pages to scrape!")
+    logging.info(f"Found {total_pages} total pages to scrape!")
 
     for current_page in range(1, total_pages + 1):
-        print(f"Scraping page {current_page}...")
+        logging.info(f"Scraping page {current_page}...")
         page_json = fetch_page_data(TARGET_URL, current_page, HEADERS)
 
         if page_json:
-            raw_apartments = page_json['pageProps']['data']['searchAds']['items']
+            try:
+                raw_apartments = page_json['pageProps']['data']['searchAds']['items']
+            except KeyError:
+                logging.warning(f"Data missing on page {current_page}")
+                raw_apartments = []
             cleaned_apartments = parse_apartments(raw_apartments)
             all_scraped_data.extend(cleaned_apartments)
 
         time.sleep(2)
 
     df = pd.DataFrame(all_scraped_data)
-    print(f"Scraping complete! Final dataset shape: {df.shape}")
+    logging.info(f"Scraping complete! Final dataset shape: {df.shape}")
 
     df.to_csv("../data/raw_rent_data.csv", index=False)
-    print("Saved to data/raw_rent_data.csv")
+    logging.info("Saved to data/raw_rent_data.csv")
 
 def fetch_page_data(url, page_number, headers):
     params = {
@@ -49,7 +55,7 @@ def fetch_page_data(url, page_number, headers):
     if response.status_code == 200:
         return response.json()
     else:
-        print(f"Failed to fetch page {page_number}. Status: {response.status_code}")
+        logging.error(f"Failed to fetch page {page_number}. Status: {response.status_code}")
         return None
 
 def get_neighborhood(location_data):
@@ -75,6 +81,8 @@ def get_neighborhood(location_data):
 def parse_apartments(apartments_list):
     page_data = []
     for apartment in apartments_list:
+        tags = [tag.get('value') for tag in apartment.get("tags", [])]
+
         apartment_data = {
             "id": apartment.get("id"),
             "title": apartment.get("title"),
@@ -84,9 +92,17 @@ def parse_apartments(apartments_list):
             "rooms": apartment.get("roomsNumber"),
             "floor": apartment.get("floorNumber"),
             "isPrivateOwner": apartment.get("isPrivateOwner"),
-            "location": get_neighborhood(apartment.get("location"))
+            "location": get_neighborhood(apartment.get("location")),
+
+            "has_ac": "AIR_CONDITIONING" in tags,
+            "has_balcony": "BALCONY" in tags,
+            "has_terrace": "TERRACE" in tags,
+            "has_parking": "PARKING_SPOT" in tags,
+            "has_storage": "STORAGE_ROOM" in tags,
+            "is_secure": "SECURE_BUILDING" in tags
         }
         page_data.append(apartment_data)
+
     return page_data
 
 if __name__ == "__main__":
