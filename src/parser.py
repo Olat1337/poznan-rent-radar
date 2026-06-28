@@ -50,12 +50,12 @@ def fetch_page_data(url, page_number, headers):
         "page": str(page_number)
     }
 
-    response = requests.get(url, params=params, headers=headers)
-
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=20)
+        response.raise_for_status()
         return response.json()
-    else:
-        logging.error(f"Failed to fetch page {page_number}. Status: {response.status_code}")
+    except requests.RequestException as exc:
+        logging.error(f"Failed to fetch page {page_number}. Error: {exc}")
         return None
 
 def get_neighborhood(location_data):

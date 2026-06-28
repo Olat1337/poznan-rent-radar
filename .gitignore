@@ -3,3 +3,5 @@ venv/
 .idea/
 data/
 __pycache__/
+*.csv
+*.log
