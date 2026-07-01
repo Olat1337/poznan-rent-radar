@@ -2,16 +2,24 @@ import numpy as np
 import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
+from contextlib import asynccontextmanager
 import os
-
-app = FastAPI(title="Poznań Real Estate Rent Predictor API")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, "models", "poznan_rent_model.pkl")
 FEATURES_PATH = os.path.join(BASE_DIR, "models", "model_features.pkl")
 
-model = joblib.load(MODEL_PATH)
-model_features = joblib.load(FEATURES_PATH)
+model = None
+model_features = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global model, model_features
+    model = joblib.load(MODEL_PATH)
+    model_features = joblib.load(FEATURES_PATH)
+    yield
+
+app = FastAPI(title="Poznań Real Estate Rent Predictor API", lifespan=lifespan)
 
 DISTRICT_MAP = {
     'Jeżyce': 'City_Center', 'Stare Miasto': 'City_Center', 'Centrum': 'City_Center',
@@ -22,7 +30,7 @@ DISTRICT_MAP = {
 }
 
 class ApartmentFeatures(BaseModel):
-    area: float = Field(..., gt=15, le=120)
+    area: float = Field(..., ge=15, le=120) # Fixed from gt to ge
     floor_num: int = Field(..., ge=-1, le=12)
     rooms_num: int = Field(..., ge=1, le=7)
     has_ac: bool

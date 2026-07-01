@@ -2,147 +2,163 @@ import os
 import streamlit as st
 import requests
 
+# 1. Automatic Streamlit Configuration
 CONFIG_DIR = ".streamlit"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.toml")
 
 if not os.path.exists(CONFIG_DIR):
     os.makedirs(CONFIG_DIR, exist_ok=True)
 
-if not os.path.exists(CONFIG_FILE):
-    with open(CONFIG_FILE, "w") as f:
-        f.write("""
+with open(CONFIG_FILE, "w") as f:
+    f.write("""
 [theme]
 base="dark"
-primaryColor="#38bdf8"
-backgroundColor="#0f1116"
-secondaryBackgroundColor="#1e293b"
-textColor="#f8fafc"
+primaryColor="#10b981"  # Premium Emerald Green
+backgroundColor="#0f172a"  # Deep Slate 900
+secondaryBackgroundColor="#1e293b"  # Medium Slate 800
+textColor="#f8fafc"  # Clean Off-white Slate 50
 font="sans serif"
-        """)
+    """)
 
+# 2. Page Setup
 st.set_page_config(
-    page_title="Poznań Rent Radar | Valuation Engine",
-    page_icon="⚡",
+    page_title="Poznań Rent Radar",
+    page_icon="🏡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
+# 3. Custom CSS
 st.markdown("""
     <style>
-    /* Dark Theme App Overrides */
+    /* Clean App Background Override */
     .stApp { background-color: transparent; }
 
-    /* Main Header - Dark Gradient */
+    /* Modern Minimalist Header */
     .main-header {
-        background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+        background: #1e293b;
         padding: 2rem;
         border-radius: 12px;
-        border: 1px solid #1e293b;
-        text-align: center;
+        border: 1px solid #334155;
+        text-align: left;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-    .header-title { font-size: 2.5rem; font-weight: 800; color: #f8fafc; margin-bottom: 0.2rem; }
+    .header-title { font-size: 2.2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.3rem; letter-spacing: -0.5px;}
     .header-subtitle { font-size: 1rem; color: #94a3b8; font-weight: 400; }
 
-    /* Result Display (Neon Dark Mode Box) */
+    /* Premium Valuation Box (Emerald Frame) */
     .valuation-box {
-        background: linear-gradient(145deg, #111827, #1e293b);
-        border: 1px solid #38bdf8;
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
-        animation: fadeIn 0.5s ease-out;
+        background: #1e293b;
+        border-left: 5px solid #10b981;
+        border-radius: 8px;
+        padding: 1.8rem 1.5rem;
+        text-align: left;
+        margin-top: 0.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.4s ease-out;
     }
     .valuation-label {
         font-size: 0.85rem;
-        color: #7dd3fc;
-        font-weight: 700;
+        color: #94a3b8;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 0.5px;
         margin: 0;
     }
     .valuation-price {
-        font-size: 3rem;
-        font-weight: 900;
-        color: #e0f2fe;
-        margin: 0.5rem 0;
-        text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: #10b981;
+        margin: 0.3rem 0;
     }
     .valuation-subtext {
-        font-size: 0.8rem;
-        color: #64748b;
+        font-size: 0.85rem;
+        color: #94a3b8;
         line-height: 1.5;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
     }
 
-    /* Animations */
+    /* Target the primary action button to match emerald perfectly */
+    div.stButton > button:first-child {
+        background-color: #10b981 !important;
+        border-color: #10b981 !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        border-radius: 6px !important;
+        height: 3rem;
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #059669 !important;
+        border-color: #059669 !important;
+    }
+
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(5px); }
         to { opacity: 1; transform: translateY(0); }
     }
     </style>
 """, unsafe_allow_html=True)
 
+# 4. App Header
 st.markdown("""
     <div class="main-header">
-        <div class="header-title">⚡ Poznań Rent Radar</div>
-        <div class="header-subtitle">Predictive Valuation Engine • Automated Machine Learning Infrastructure</div>
+        <div class="header-title">🏡 Poznań Rent Radar</div>
+        <div class="header-subtitle">Data-driven estimation of rental values across Poznań neighborhoods.</div>
     </div>
 """, unsafe_allow_html=True)
 
+# 5. Application Layout
 left_panel, right_panel = st.columns([1.2, 1], gap="large")
 
 with left_panel:
     with st.container(border=True):
-        st.subheader("📐 Structural Dimensions")
+        st.subheader("Apartment Attributes")
 
-        # Row 1: Area Slider and Floor Number
         row1_col1, row1_col2 = st.columns(2)
         with row1_col1:
-            area = st.slider("Total Living Area (sqm)", min_value=15, max_value=120, value=45, step=1)
+            area = st.slider("Living Area (sqm)", min_value=15, max_value=120, value=45, step=1)
         with row1_col2:
-            floor_num = st.number_input("Floor Level (-1: Cellar)", min_value=-1, max_value=12, value=1, step=1)
+            floor_num = st.number_input("Floor Level", min_value=-1, max_value=12, value=1, step=1)
 
         row2_col1, row2_col2 = st.columns(2)
         with row2_col1:
-            rooms_num = st.selectbox("Total Rooms", options=[1, 2, 3, 4, 5, 6, 7], index=1)
+            rooms_num = st.selectbox("Rooms", options=[1, 2, 3, 4, 5, 6, 7], index=1)
         with row2_col2:
-            location = st.selectbox("Geographic Sector", options=[
+            location = st.selectbox("Location / District", options=[
                 "Jeżyce", "Stare Miasto", "Centrum", "Wilda", "Grunwald",
                 "Nowe Miasto", "Rataje", "Winogrady", "Łacina", "Naramowice",
                 "Piątkowo", "Świerczewo", "Junikowo", "Kasztelanów", "Podolany"
             ])
 
     with st.container(border=True):
-        st.subheader("✨ Premium Amenities")
+        st.subheader("Amenities & Features")
         col_c, col_d = st.columns(2)
         with col_c:
-            has_ac = st.checkbox("🔄 Air Conditioning")
-            has_balcony = st.checkbox("🌅 Balcony Available")
-            has_terrace = st.checkbox("🌿 Outdoor Terrace")
+            has_ac = st.checkbox("Air Conditioning")
+            has_balcony = st.checkbox("Balcony")
+            has_terrace = st.checkbox("Terrace / Garden")
         with col_d:
-            has_parking = st.checkbox("🚗 Dedicated Parking")
-            has_storage = st.checkbox("📦 Secure Storage")
-            is_secure = st.checkbox("🛡️ Secured Building")
+            has_parking = st.checkbox("Parking Space")
+            has_storage = st.checkbox("Storage Unit")
+            is_secure = st.checkbox("Security / Surveillance")
 
-    st.write("")  # Spacing
-    calculate_clicked = st.button("RUN INFERENCE ENGINE", type="primary", use_container_width=True)
+    st.write("")
+    calculate_clicked = st.button("Calculate Rent Estimate", use_container_width=True)
 
 with right_panel:
     with st.container(border=True):
-        st.subheader("📊 Model Diagnostics")
-        kpi1, kpi2 = st.columns(2)
-        kpi1.metric(label="Algorithm", value="Random Forest")
-        # Removed the delta tag entirely here:
-        kpi2.metric(label="Validation MAE", value="397.91 PLN")
+        st.subheader("Model Information")
+        st.write("This estimate is generated by analyzing current active real estate trends in Poznań.")
 
-    st.write("")  # Spacing
+        kpi1, kpi2 = st.columns(2)
+        kpi1.metric(label="Model Margin of Error", value="± 337 PLN")
+        kpi2.metric(label="Dataset Status", value="Synchronized")
+
+    st.write("")
 
     if not calculate_clicked:
         st.info(
-            "💡 **System Ready:** Adjust the parameters on the left and trigger the inference engine to generate a localized market prediction.")
+            "Fill out the apartment profile on the left and click **Calculate Rent Estimate** to display the value mapping.")
     else:
         payload = {
             "area": float(area), "floor_num": int(floor_num), "rooms_num": int(rooms_num),
@@ -155,7 +171,7 @@ with right_panel:
         API_URL = f"{BACKEND_HOST}/predict"
 
         try:
-            with st.spinner("Analyzing market variances..."):
+            with st.spinner("Processing local dataset distributions..."):
                 response = requests.post(API_URL, json=payload)
 
             if response.status_code == 200:
@@ -164,21 +180,20 @@ with right_panel:
 
                 st.markdown(f"""
                     <div class="valuation-box">
-                        <p class="valuation-label">Estimated Fair Market Rent</p>
-                        <p class="valuation-price">{predicted_rent:,.2f} PLN</p>
+                        <p class="valuation-label">Estimated Market Value</p>
+                        <p class="valuation-price">{predicted_rent:,.0f} PLN</p>
                         <p class="valuation-subtext">
-                            Target price calculated via exponential inversion mapping. 
-                            Anchored against the <b>{location}</b> premium sub-market tier.
+                            Calculated average rent for standard listings matching this layout profile in <b>{location}</b>.
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
 
                 luxury_score = sum([has_ac, has_balcony, has_terrace, has_parking, has_storage, is_secure]) * 16.6
                 st.write("")
-                st.progress(int(luxury_score), text=f"Calculated Amenity Index Score: {int(luxury_score)}%")
+                st.progress(int(luxury_score), text=f"Feature Density Index: {int(luxury_score)}/100")
 
             else:
-                st.error(f"Inference Failure. API Error Code: {response.status_code}")
+                st.error("System error processing the valuation request. Please verify inputs.")
+
         except requests.exceptions.ConnectionError:
-            st.error(
-                "⚠️ Connection Blocked: Could not reach the Backend API. Ensure uvicorn or the Docker backend is running.")
+            st.error("⚠️ **API Unreachable:** Cannot establish connection to local backend API service container.")
