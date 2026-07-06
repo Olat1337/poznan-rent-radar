@@ -1,6 +1,6 @@
-# 🏡 Poznań Rent Radar: Real Estate Valuation Engine
+# 🏡 Poznań Rent Radar: Real Estate Valuation Estimator
 
-An end-to-end machine learning and data application that predicts fair market rental prices for apartments in Poznań, Poland. 
+A machine learning project that estimates fair market rental prices for apartments in Poznań, Poland.
 
 [![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -8,97 +8,101 @@ An end-to-end machine learning and data application that predicts fair market re
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.5+-F7931E.svg?logo=scikit-learn)](https://scikit-learn.org/)
 [![Pandas](https://img.shields.io/badge/pandas-2.2+-150458.svg?logo=pandas)](https://pandas.pydata.org/)
 [![NumPy](https://img.shields.io/badge/numpy-2.1+-013243.svg?logo=numpy)](https://numpy.org/)
+
 ## 🔗 Live Demo
 * **Frontend UI (Streamlit):** https://poznan-rent-radar-ui.up.railway.app
 * **Backend API (FastAPI):** https://poznan-rent-radar-api.up.railway.app/docs
+
 <img width="1920" height="1080" alt="Poznan Rent Radar GIF" src="https://github.com/user-attachments/assets/b02687b7-6a15-4844-acec-bde6063a1b99" />
 
 ## 🎯 Project Overview
-Finding an apartment can be stressful, and knowing if a listing is fairly priced is a constant challenge. **Poznań Rent Radar** solves this by scraping live real estate listings, processing the data, and using an AI algorithm to calculate the true market value of an apartment based on its structural dimensions, location, and premium amenities.
+I built this project to learn and demonstrate a complete machine learning pipeline—from data collection to web deployment. 
 
-This project was built from scratch to demonstrate a complete, production-ready Data Science lifecycle-from web scraping and Exploratory Data Analysis (EDA) to Machine Learning and cloud deployment.
+The application scrapes real estate listings, processes the data, and uses a trained model to estimate the rental value of an apartment based on features like area, location, and amenities. 
 
+## 🛠️ Technology Stack & Architecture Decisions
 
-## 🛠️ Full Technology Stack
+I split this application into a decoupled backend API and a frontend UI.
 
-To ensure high availability, accurate analysis, and fast performance, the application utilizes a modern Python data ecosystem and a decoupled microservices architecture.
+### Data Engineering & Modeling
+* **Stack:** Python, Pandas, NumPy, Scikit-Learn.
+* **Why this stack:** Standard, well-documented tools for data cleaning, transformation, and model building.
+* **Why Random Forest:** I chose a Random Forest model over linear models after benchmarking on log-transformed prices because it was much better at handling non-linear feature interactions in real estate pricing.
 
-### Data Engineering & EDA
-* **Pandas & NumPy:** For rigorous data manipulation, cleaning, and numerical transformations.
-* **Seaborn & Matplotlib:** For generating visual market insights, detecting outliers, and mapping feature distributions.
-* **Python Built-ins (`ast`, `re`):** Used extensively for safely evaluating nested JSON strings and dynamically parsing Next.js build IDs during web scraping.
-
-### Machine Learning
-* **Scikit-Learn:** Built and tuned a Random Forest Regressor featuring Natural Log Transformations and leak-free Train/Test splits.
-* **Joblib:** For efficient serialization and deserialization of the trained `.pkl` models into the backend.
-
-### Full-Stack Architecture
-* **Backend Engine (FastAPI & Uvicorn):** A high-performance REST API utilizing **Pydantic** for strict data validation and request routing.
-* **Presentation Layer (Streamlit & Requests):** A responsive web interface that consumes the API and displays predictions.
-* **CI/CD Cloud Deployment (Railway):** Both services are deployed independently using Railway's native Nixpacks build engine to prevent port-racing conditions.
+### Web Frameworks & Deployment
+* **Backend:** FastAPI.
+* **Frontend:** Streamlit.
+* **Why decouple them:** Separating the ML inference API from the UI makes the application easier to test locally and allows each service to be restarted or debugged independently. I chose Streamlit because it allows for rapid UI prototyping for data apps.
+* **Deployment:** Automated CI/CD on Railway.
+* **Why Railway:** It offers a straightforward platform for deploying independent Docker/Nixpacks containers directly from GitHub, preventing port conflicts between the API and the UI.
 
 ## 📊 Data & Modeling Workflow
 
 Before deployment, data exploration and model training were completed in `notebooks/EDA_and_Cleaning.ipynb`:
 
-* **Data Cleaning:** Parsed nested string JSON structures and calculated `true_price` (Total Rent + Admin Rent).
-* **Feature Encoding:** Converted text layout descriptions (e.g., `"GROUND"`, `"FIRST"`) into sequential integer mapping.
-* **Outlier Removal:** Filtered entries outside realistic ranges (15-120 sqm, 1,200-8,000 PLN) to eliminate human errors.
+* **Data Cleaning:** Parsed nested JSON strings to calculate `true_price` (Total Rent + Admin Rent).
+* **Feature Engineering:** Applied one-hot encoding for categorical variables and converted text layout descriptions (e.g., `"GROUND"`, `"FIRST"`) into sequential integer mapping.
+* **Outlier Removal:** Filtered entries outside realistic bounds (15-120 sqm, 1,200-8,000 PLN) to remove parsing errors and bad listings.
+* **Log Transformation:** Applied log transforms to target prices to stabilize right-skewed pricing distributions.
 * **Leakage Mitigation:** Split data 80/20 and imputed missing values using the median derived strictly from the training set.
-* **Log Transformation:** Stabilized right-skewed pricing targets by fitting the model on the natural log (`np.log`) of the rent.
+
+## 📈 Model Performance
+* **Algorithm:** Random Forest Regressor.
+* **Validation MAE:** ~337 PLN. This means the model's estimates are, on average, within 337 PLN of the actual listed rental price.
+
 ## 📁 Repository Structure
 
 ```text
 ├── .streamlit/                
 │   └── config.toml            # UI Theme Configuration
 ├── app/
-│   ├── api.py                 # FastAPI backend implementation
-│   └── ui.py                  # Streamlit frontend user interface
+│   ├── api.py                 # FastAPI backend endpoints
+│   └── ui.py                  # Streamlit frontend layout
 ├── models/
 │   ├── model_features.pkl     # Saved One-Hot Encoded feature columns
 │   └── poznan_rent_model.pkl  # Trained Random Forest Regressor
 ├── notebooks/
-│   └── EDA_and_Cleaning.ipynb # Data cleaning, EDA, and model training workflow
+│   └── EDA_and_Cleaning.ipynb # Data cleaning, EDA, and training workflow
 ├── src/
-│   └── parser.py              # Dynamic Next.js scraper logic
-├── requirements.txt           # Frozen production dependencies
-├── .gitignore                 # Configures files and directories to ignore in Git
-└── README.md                  # Project documentation
-(Note: Raw scraped data and local log files are intentionally git-ignored to maintain clean version control hygiene).
+│   └── parser.py              # Scraper logic
+├── requirements.txt           # Environment dependencies
+├── .gitignore                 
+└── README.md                  
+
+(Note: Raw scraped data and local log files are git-ignored).
 ```
-## 📈 Model Performance
-Algorithm: Random Forest Regressor
 
-Validation MAE: ~337 PLN (The model predicts the monthly rent within an average margin of error of 340 PLN compared to reality).
-
-Key Insights: Feature importance analysis revealed that physical area dictates 55% of pricing weight, followed closely by central location premiums (e.g., Jeżyce, Stare Miasto).
 ## 🚀 How to Run Locally
-If you would like to run this application on your own machine, follow these steps:
 
 1. Clone the repository
 ```Bash
 git clone https://github.com/Olat1337/poznan-rent-radar.git
 cd poznan-rent-radar
 ```
+
 2. Install dependencies
 ```Bash
 pip install -r requirements.txt
 ```
+
 3. Start the Backend API
-In your first terminal, spin up the FastAPI server:
+In your first terminal, start the FastAPI server:
 ```Bash
 uvicorn app.api:app --reload --port 8080
 ```
+
 4. Start the Frontend UI
-Open a second terminal, inject the local API URL, and start Streamlit:
-On Mac/Linux:
-```Bash
-export BACKEND_URL="http://127.0.0.1:8080"
-streamlit run app/ui.py
-```
-On Windows (PowerShell):
-```Bash
-$env:BACKEND_URL="http://127.0.0.1:8080"
-streamlit run app/ui.py
-```
-The UI will automatically open in your browser at http://localhost:8501.
+Open a second terminal, set the local API URL environment variable, and start Streamlit:
+  
+  *On Mac/Linux:*
+  ```Bash
+  export BACKEND_URL="http://127.0.0.1:8080"
+  streamlit run app/ui.py
+  ```
+  
+  *On Windows (PowerShell):*
+  ```Bash
+  $env:BACKEND_URL="http://127.0.0.1:8080"
+  streamlit run app/ui.py
+  ```
+  The UI will automatically open in your browser at `http://localhost:8501`.
