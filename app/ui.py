@@ -13,10 +13,10 @@ with open(CONFIG_FILE, "w") as f:
     f.write("""
 [theme]
 base="dark"
-primaryColor="#10b981"  # Premium Emerald Green
-backgroundColor="#0f172a"  # Deep Slate 900
-secondaryBackgroundColor="#1e293b"  # Medium Slate 800
-textColor="#f8fafc"  # Clean Off-white Slate 50
+primaryColor="#5c6ac4"
+backgroundColor="#0d0d12"
+secondaryBackgroundColor="#16161e"
+textColor="#e4e4e7"
 font="sans serif"
     """)
 
@@ -31,70 +31,154 @@ st.set_page_config(
 # 3. Custom CSS
 st.markdown("""
     <style>
-    /* Clean App Background Override */
-    .stApp { background-color: transparent; }
-
-    /* Modern Minimalist Header */
-    .main-header {
-        background: #1e293b;
-        padding: 2rem;
-        border-radius: 12px;
-        border: 1px solid #334155;
-        text-align: left;
-        margin-bottom: 2rem;
+    header[data-testid="stHeader"] {
+        display: none !important;
+        height: 0 !important;
     }
-    .header-title { font-size: 2.2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.3rem; letter-spacing: -0.5px;}
-    .header-subtitle { font-size: 1rem; color: #94a3b8; font-weight: 400; }
 
-    /* Premium Valuation Box (Emerald Frame) */
-    .valuation-box {
-        background: #1e293b;
-        border-left: 5px solid #10b981;
-        border-radius: 8px;
-        padding: 1.8rem 1.5rem;
+    footer {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    .block-container {
+        padding-top: 1.2rem !important;
+        padding-bottom: 0rem !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        max-width: 1200px !important;
+    }
+
+    [data-testid="column"] > div > div {
+        gap: 0.2rem !important;
+    }
+
+    .stApp { 
+        background-color: #0d0d12 !important;
+    }
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1px solid #272733 !important; 
+        border-radius: 12px !important;
+        background-color: #16161e !important;
+        padding: 0.6rem 1rem !important;
+    }
+
+    .main-header {
+        background-color: transparent;
+        padding: 0.2rem 0.5rem 0.8rem 0.5rem;
         text-align: left;
-        margin-top: 0.5rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        animation: fadeIn 0.4s ease-out;
+    }
+    .header-tag {
+        color: #5c6ac4;
+        font-family: monospace;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    .header-title { 
+        font-size: 2.3rem; 
+        font-weight: 700; 
+        color: #f8f8f2; 
+        margin-bottom: 0.2rem; 
+        letter-spacing: -0.5px;
+    }
+    .header-subtitle { 
+        font-size: 1rem; 
+        color: #a0a0ab; 
+        font-weight: 500; 
+    }
+
+    .valuation-box {
+        background-color: #1e1e29;
+        border: 1px solid #2d2d3d;
+        border-radius: 10px;
+        padding: 1.2rem;
+        text-align: left;
+        margin-top: 0.2rem;
     }
     .valuation-label {
-        font-size: 0.85rem;
-        color: #94a3b8;
+        font-size: 0.9rem;
+        color: #a0a0ab; 
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin: 0;
     }
     .valuation-price {
-        font-size: 2.8rem;
+        font-size: 2.4rem;
         font-weight: 700;
-        color: #10b981;
-        margin: 0.3rem 0;
+        color: #f8f8f2;
+        margin: 0.2rem 0;
     }
     .valuation-subtext {
-        font-size: 0.85rem;
-        color: #94a3b8;
-        line-height: 1.5;
-        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #a0a0ab;
+        line-height: 1.3;
+        margin-top: 0.2rem;
     }
 
-    /* Target the primary action button to match emerald perfectly */
+    .custom-info-box {
+        background-color: #1e1e29;
+        border: 1px solid #2d2d3d;
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        color: #a0a0ab;
+        font-size: 0.95rem;
+        margin-top: 0.2rem;
+    }
+
     div.stButton > button:first-child {
-        background-color: #10b981 !important;
-        border-color: #10b981 !important;
+        background-color: #5c6ac4 !important;
+        border: none !important;
         color: #ffffff !important;
-        font-weight: 600 !important;
-        border-radius: 6px !important;
-        height: 3rem;
+        font-weight: 500 !important;
+        border-radius: 8px !important;
+        height: 2.8rem;
+        font-size: 1.05rem !important;
+        margin-top: 0.4rem !important;
+        transition: background-color 0.2s ease !important;
     }
     div.stButton > button:first-child:hover {
-        background-color: #059669 !important;
-        border-color: #059669 !important;
+        background-color: #6d7ad8 !important; 
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
+    .stSelectbox div[data-baseweb="select"], 
+    .stNumberInput div[data-baseweb="input"] {
+        border-color: #2d2d3d !important;
+        background-color: #1e1e29 !important;
+        border-radius: 6px !important;
+        font-size: 1rem !important;
+    }
+
+    div[data-baseweb="slider"] div[data-testid="stTickBar"] > div {
+        background-color: #5c6ac4 !important;
+    }
+
+    *:focus {
+        outline-color: #5c6ac4 !important;
+    }
+
+    h3 {
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
+        color: #e4e4e7 !important;
+        padding-bottom: 0.4rem !important;
+    }
+
+    [data-testid="stMetricValue"] {
+        font-size: 1.6rem !important;
+        font-weight: 600 !important;
+        color: #f8f8f2 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #a0a0ab !important;
+        font-size: 0.95rem !important;
+    }
+
+    [data-testid="stCheckbox"] label span {
+        color: #a0a0ab !important;
+        font-size: 0.95rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -102,13 +186,14 @@ st.markdown("""
 # 4. App Header
 st.markdown("""
     <div class="main-header">
-        <div class="header-title">🏡 Poznań Rent Radar</div>
-        <div class="header-subtitle">Data-driven estimation of rental values across Poznań neighborhoods.</div>
+        <div class="header-tag">For {data_scientists}</div>
+        <div class="header-title">Poznań Rent Radar</div>
+        <div class="header-subtitle">A tool for data-driven rental estimations.</div>
     </div>
 """, unsafe_allow_html=True)
 
 # 5. Application Layout
-left_panel, right_panel = st.columns([1.2, 1], gap="large")
+left_panel, right_panel = st.columns([1.2, 1], gap="medium")
 
 with left_panel:
     with st.container(border=True):
@@ -142,23 +227,26 @@ with left_panel:
             has_storage = st.checkbox("Storage Unit")
             is_secure = st.checkbox("Security / Surveillance")
 
-    st.write("")
     calculate_clicked = st.button("Calculate Rent Estimate", use_container_width=True)
 
 with right_panel:
     with st.container(border=True):
         st.subheader("Model Information")
-        st.write("This estimate is generated by analyzing current active real estate trends in Poznań.")
+        st.markdown(
+            "<span style='color: #a0a0ab; font-size: 0.95rem;'>This estimate uses current real estate data in Poznań.</span>",
+            unsafe_allow_html=True)
+        st.write("")
 
         kpi1, kpi2 = st.columns(2)
         kpi1.metric(label="Model Margin of Error", value="± 337 PLN")
         kpi2.metric(label="Dataset Status", value="Synchronized")
 
-    st.write("")
-
     if not calculate_clicked:
-        st.info(
-            "Fill out the apartment profile on the left and click **Calculate Rent Estimate** to display the value mapping.")
+        st.markdown("""
+            <div class="custom-info-box">
+                Fill out the apartment profile on the left and click <b>Calculate Rent Estimate</b> to display the value.
+            </div>
+        """, unsafe_allow_html=True)
     else:
         payload = {
             "area": float(area), "floor_num": int(floor_num), "rooms_num": int(rooms_num),
@@ -171,7 +259,7 @@ with right_panel:
         API_URL = f"{BACKEND_HOST}/predict"
 
         try:
-            with st.spinner("Processing local dataset distributions..."):
+            with st.spinner("Processing data..."):
                 response = requests.post(API_URL, json=payload)
 
             if response.status_code == 200:
@@ -183,17 +271,13 @@ with right_panel:
                         <p class="valuation-label">Estimated Market Value</p>
                         <p class="valuation-price">{predicted_rent:,.0f} PLN</p>
                         <p class="valuation-subtext">
-                            Calculated average rent for standard listings matching this layout profile in <b>{location}</b>.
+                            Average rent for this profile in <b>{location}</b>.
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
 
-                luxury_score = sum([has_ac, has_balcony, has_terrace, has_parking, has_storage, is_secure]) * 16.6
-                st.write("")
-                st.progress(int(luxury_score), text=f"Feature Density Index: {int(luxury_score)}/100")
-
             else:
-                st.error("System error processing the valuation request. Please verify inputs.")
+                st.error("Error processing the request. Please check your inputs.")
 
         except requests.exceptions.ConnectionError:
-            st.error("⚠️ **API Unreachable:** Cannot establish connection to local backend API service container.")
+            st.error("API Unreachable: Cannot connect to the local backend service.")

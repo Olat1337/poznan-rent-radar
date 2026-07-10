@@ -1,9 +1,9 @@
 
 [theme]
 base="dark"
-primaryColor="#10b981"  # Premium Emerald Green
-backgroundColor="#0f172a"  # Deep Slate 900
-secondaryBackgroundColor="#1e293b"  # Medium Slate 800
-textColor="#f8fafc"  # Clean Off-white Slate 50
+primaryColor="#5c6ac4"
+backgroundColor="#0d0d12"
+secondaryBackgroundColor="#16161e"
+textColor="#e4e4e7"
 font="sans serif"
     
