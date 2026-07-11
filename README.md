@@ -13,7 +13,7 @@ A machine learning project that estimates fair market rental prices for apartmen
 * **Frontend UI (Streamlit):** https://poznan-rent-radar-ui.up.railway.app
 * **Backend API (FastAPI):** https://poznan-rent-radar-api.up.railway.app/docs
 
-<img width="1920" height="1080" alt="Poznan Rent Radar GIF" src="https://github.com/user-attachments/assets/b02687b7-6a15-4844-acec-bde6063a1b99" />
+<img width="1920" height="1080" alt="POZNAN RENT RADAR UI GIF" src="https://github.com/user-attachments/assets/0c661cf3-90b6-4367-92c9-ade233ee6125" />
 
 ## 🎯 Project Overview
 I built this project to learn and demonstrate a complete machine learning pipeline—from data collection to web deployment. 
