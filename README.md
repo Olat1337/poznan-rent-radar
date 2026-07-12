@@ -5,6 +5,8 @@ A machine learning project that estimates fair market rental prices for apartmen
 [![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.41+-FF4B4B.svg?logo=streamlit)](https://streamlit.io/)
+[![CatBoost](https://img.shields.io/badge/CatBoost-1.2+-yellow.svg)](https://catboost.ai/)
+[![Optuna](https://img.shields.io/badge/Optuna-3.6+-blue.svg)](https://optuna.org/)
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.5+-F7931E.svg?logo=scikit-learn)](https://scikit-learn.org/)
 [![Pandas](https://img.shields.io/badge/pandas-2.2+-150458.svg?logo=pandas)](https://pandas.pydata.org/)
 [![NumPy](https://img.shields.io/badge/numpy-2.1+-013243.svg?logo=numpy)](https://numpy.org/)
@@ -13,10 +15,10 @@ A machine learning project that estimates fair market rental prices for apartmen
 * **Frontend UI (Streamlit):** https://poznan-rent-radar-ui.up.railway.app
 * **Backend API (FastAPI):** https://poznan-rent-radar-api.up.railway.app/docs
 
-<img width="1920" height="1080" alt="POZNAN RENT RADAR UI GIF" src="https://github.com/user-attachments/assets/0c661cf3-90b6-4367-92c9-ade233ee6125" />
+<img width="1920" height="1080" alt="Poznan Rent Radar UI GIF" src="https://github.com/user-attachments/assets/5708b1fc-0119-4be3-b9ec-63ed3bfb7e66" />
 
 ## 🎯 Project Overview
-I built this project to learn and demonstrate a complete machine learning pipeline—from data collection to web deployment. 
+I built this project to learn and demonstrate a complete machine learning pipeline-from data collection to web deployment. 
 
 The application scrapes real estate listings, processes the data, and uses a trained model to estimate the rental value of an apartment based on features like area, location, and amenities. 
 
@@ -25,9 +27,9 @@ The application scrapes real estate listings, processes the data, and uses a tra
 I split this application into a decoupled backend API and a frontend UI.
 
 ### Data Engineering & Modeling
-* **Stack:** Python, Pandas, NumPy, Scikit-Learn.
-* **Why this stack:** Standard, well-documented tools for data cleaning, transformation, and model building.
-* **Why Random Forest:** I chose a Random Forest model over linear models after benchmarking on log-transformed prices because it was much better at handling non-linear feature interactions in real estate pricing.
+* **Stack:** Python, Pandas, NumPy, Scikit-Learn, CatBoost, Optuna.
+* **Why this stack:** Standard, well-documented tools for data cleaning and transformation. Optuna is fantastic for automated, highly efficient hyperparameter tuning.
+* **Why CatBoost:** After testing Random Forest, LightGBM, XGBoost, and a combined Voting Ensemble model, pure CatBoost achieved the best overall accuracy (lowest MAE) on this specific dataset without overfitting.
 
 ### Web Frameworks & Deployment
 * **Backend:** FastAPI.
@@ -38,17 +40,16 @@ I split this application into a decoupled backend API and a frontend UI.
 
 ## 📊 Data & Modeling Workflow
 
-Before deployment, data exploration and model training were completed in `notebooks/EDA_and_Cleaning.ipynb`:
+Before deployment, data exploration and model training were broken down into a clear, step-by-step pipeline located in the `notebooks/` folder:
 
-* **Data Cleaning:** Parsed nested JSON strings to calculate `true_price` (Total Rent + Admin Rent).
-* **Feature Engineering:** Applied one-hot encoding for categorical variables and converted text layout descriptions (e.g., `"GROUND"`, `"FIRST"`) into sequential integer mapping.
-* **Outlier Removal:** Filtered entries outside realistic bounds (15-120 sqm, 1,200-8,000 PLN) to remove parsing errors and bad listings.
-* **Log Transformation:** Applied log transforms to target prices to stabilize right-skewed pricing distributions.
-* **Leakage Mitigation:** Split data 80/20 and imputed missing values using the median derived strictly from the training set.
+* **`1_EDA_and_Cleaning.ipynb`:** Cleaned the raw scraped JSON data, calculated `true_price` (Total + Admin Rent), and removed extreme outliers (filtered to 15-120 sqm and 1,200-8,000 PLN). Converted categories using One-Hot Encoding and ordinal mapping.
+* **`2_Finding_best_hyperparams.ipynb`:** Applied a safe log transformation (`np.log1p`) to stabilize right-skewed pricing distributions. Ran 200 optimization trials per algorithm using Optuna to find the absolute best model parameters.
+* **`3_ML_training.ipynb`:** Safely split the data 80/20 and prevented data leakage by imputing missing values strictly using the training set median. Trained and evaluated Random Forest, LightGBM, XGBoost, CatBoost, and an Ensemble model. 
+* **`4_Conclusion_Evaluation_and_Feature_Importance.ipynb`:** Extracted feature importances (discovered `area` is the dominant price driver). Visualized actual vs. predicted errors to design a safety guardrail for the UI.
 
-## 📈 Model Performance
-* **Algorithm:** Random Forest Regressor.
-* **Validation MAE:** ~337 PLN. This means the model's estimates are, on average, within 337 PLN of the actual listed rental price.
+## 📈 Model Performance & Safety
+* **Algorithm:** CatBoost Regressor.
+* **Validation MAE:** ~307 PLN. This means the model's estimates are, on average, within 307 PLN of the actual listed rental price.
 
 ## 📁 Repository Structure
 
@@ -59,10 +60,14 @@ Before deployment, data exploration and model training were completed in `notebo
 │   ├── api.py                 # FastAPI backend endpoints
 │   └── ui.py                  # Streamlit frontend layout
 ├── models/
-│   ├── model_features.pkl     # Saved One-Hot Encoded feature columns
-│   └── poznan_rent_model.pkl  # Trained Random Forest Regressor
+│   ├── model_features.pkl         # Saved One-Hot Encoded feature columns
+│   └── catboost_housing_model.pkl # Trained CatBoost Regressor
 ├── notebooks/
-│   └── EDA_and_Cleaning.ipynb # Data cleaning, EDA, and training workflow
+│   ├── 0_Project_Overview.ipynb
+│   ├── 1_EDA_and_Cleaning.ipynb 
+│   ├── 2_Finding_best_hyperparams.ipynb
+│   ├── 3_ML_training.ipynb
+│   └── 4_Conclusion_Evaluation_and_Feature_Importance.ipynb
 ├── src/
 │   └── parser.py              # Scraper logic
 ├── requirements.txt           # Environment dependencies
@@ -81,28 +86,30 @@ cd poznan-rent-radar
 ```
 
 2. Install dependencies
+
 ```Bash
 pip install -r requirements.txt
 ```
 
 3. Start the Backend API
 In your first terminal, start the FastAPI server:
+
 ```Bash
 uvicorn app.api:app --reload --port 8080
 ```
 
 4. Start the Frontend UI
 Open a second terminal, set the local API URL environment variable, and start Streamlit:
-  
-  *On Mac/Linux:*
-  ```Bash
-  export BACKEND_URL="http://127.0.0.1:8080"
-  streamlit run app/ui.py
-  ```
-  
-  *On Windows (PowerShell):*
-  ```Bash
-  $env:BACKEND_URL="http://127.0.0.1:8080"
-  streamlit run app/ui.py
-  ```
-  The UI will automatically open in your browser at `http://localhost:8501`.
+
+On Mac/Linux:
+
+```Bash
+export BACKEND_URL="http://127.0.0.1:8080"
+streamlit run app/ui.py
+```
+On Windows (PowerShell):
+```Bash
+$env:BACKEND_URL="http://127.0.0.1:8080"
+streamlit run app/ui.py
+```
+The UI will automatically open in your browser at http://localhost:8501.
