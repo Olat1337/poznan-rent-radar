@@ -1,6 +1,7 @@
 import numpy as np
+import pandas as pd
 import joblib
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
 import os
@@ -30,7 +31,7 @@ DISTRICT_MAP = {
 }
 
 class ApartmentFeatures(BaseModel):
-    area: float = Field(..., ge=15, le=120) # Fixed from gt to ge
+    area: float = Field(..., ge=15, le=120)
     floor_num: int = Field(..., ge=-1, le=12)
     rooms_num: int = Field(..., ge=1, le=7)
     has_ac: bool
@@ -45,40 +46,32 @@ class ApartmentFeatures(BaseModel):
 def home():
     return {"message": "API is online. Send a POST request to /predict to get a rental estimate."}
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
 @app.post("/predict")
 def predict_rent(features: ApartmentFeatures):
-    user_district = DISTRICT_MAP.get(features.location, 'Other')
+    try:
+        user_district = DISTRICT_MAP.get(features.location, 'Other')
 
-    target_location_col = f"location_{features.location}"
-    target_district_col = f"district_category_{user_district}"
+        input_data = {
+            "area": features.area,
+            "floor_num": features.floor_num,
+            "rooms_num": features.rooms_num,
+            "has_ac": int(features.has_ac),
+            "has_balcony": int(features.has_balcony),
+            "has_terrace": int(features.has_terrace),
+            "has_parking": int(features.has_parking),
+            "has_storage": int(features.has_storage),
+            "is_secure": int(features.is_secure),
+            f"location_{features.location}": 1,
+            f"district_category_{user_district}": 1
+        }
 
-    structural_values = {
-        "area": features.area,
-        "floor_num": features.floor_num,
-        "rooms_num": features.rooms_num,
-        "has_ac": int(features.has_ac),
-        "has_balcony": int(features.has_balcony),
-        "has_terrace": int(features.has_terrace),
-        "has_parking": int(features.has_parking),
-        "has_storage": int(features.has_storage),
-        "is_secure": int(features.is_secure)
-    }
+        input_df = pd.DataFrame([input_data])
+        input_df = input_df.reindex(columns=model_features, fill_value=0)
 
-    final_input_row = []
-    for col_name in model_features:
-        if col_name in structural_values:
-            final_input_row.append(structural_values[col_name])
-        elif col_name == target_location_col or col_name == target_district_col:
-            final_input_row.append(1)
-        else:
-            final_input_row.append(0)
+        log_prediction = model.predict(input_df)
+        estimated_price_pln = float(np.exp(log_prediction)[0])
 
-    input_matrix = [final_input_row]
-    log_prediction = model.predict(input_matrix)
-    estimated_price_pln = float(np.exp(log_prediction)[0])
+        return {"predicted_fair_rent_pln": round(estimated_price_pln, 2)}
 
-    return {"predicted_fair_rent_pln": round(estimated_price_pln, 2)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
