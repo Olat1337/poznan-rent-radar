@@ -91,14 +91,19 @@ cd poznan-rent-radar
 pip install -r requirements.txt
 ```
 
-3. Start the Backend API
+3. If it's your first run, run parser.py
+```Bash
+python src/parser.py
+```
+
+4. Start the Backend API
 In your first terminal, start the FastAPI server:
 
 ```Bash
 uvicorn app.api:app --reload --port 8080
 ```
 
-4. Start the Frontend UI
+5. Start the Frontend UI
 Open a second terminal, set the local API URL environment variable, and start Streamlit:
 
 On Mac/Linux:
