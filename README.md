@@ -29,7 +29,7 @@ I split this application into a decoupled backend API and a frontend UI.
 ### Data Engineering & Modeling
 * **Stack:** Python, Pandas, NumPy, Scikit-Learn, CatBoost, Optuna.
 * **Why this stack:** Standard, well-documented tools for data cleaning and transformation. Optuna is fantastic for automated, highly efficient hyperparameter tuning.
-* **Why CatBoost:** After testing Random Forest, LightGBM, XGBoost, and a combined Voting Ensemble model, pure CatBoost achieved the best overall accuracy (lowest MAE) on this specific dataset without overfitting.
+* **Why CatBoost:** After benchmarking on log-transformed prices and testing Random Forest, LightGBM, XGBoost, and a combined Voting Ensemble model, pure CatBoost achieved the best overall accuracy (lowest MAE) on this specific dataset without overfitting.
 
 ### Web Frameworks & Deployment
 * **Backend:** FastAPI.
