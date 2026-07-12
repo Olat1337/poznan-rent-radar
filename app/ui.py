@@ -42,8 +42,8 @@ st.markdown("""
     }
 
     .block-container {
-        padding-top: 1.2rem !important;
-        padding-bottom: 0rem !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 1rem !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
         max-width: 1200px !important;
@@ -62,60 +62,6 @@ st.markdown("""
         border-radius: 12px !important;
         background-color: #16161e !important;
         padding: 0.6rem 1rem !important;
-    }
-
-    .main-header {
-        background-color: transparent;
-        padding: 0.2rem 0.5rem 0.8rem 0.5rem;
-        text-align: left;
-    }
-    .header-tag {
-        color: #5c6ac4;
-        font-family: monospace;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.3rem;
-    }
-    .header-title { 
-        font-size: 2.3rem; 
-        font-weight: 700; 
-        color: #f8f8f2; 
-        margin-bottom: 0.2rem; 
-        letter-spacing: -0.5px;
-    }
-    .header-subtitle { 
-        font-size: 1rem; 
-        color: #a0a0ab; 
-        font-weight: 500; 
-    }
-
-    .valuation-box {
-        background-color: #1e1e29;
-        border: 1px solid #2d2d3d;
-        border-radius: 10px;
-        padding: 1.2rem;
-        text-align: left;
-        margin-top: 0.2rem;
-    }
-    .valuation-label {
-        font-size: 0.9rem;
-        color: #a0a0ab; 
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-    .valuation-price {
-        font-size: 2.4rem;
-        font-weight: 700;
-        color: #f8f8f2;
-        margin: 0.2rem 0;
-    }
-    .valuation-subtext {
-        font-size: 0.9rem;
-        color: #a0a0ab;
-        line-height: 1.3;
-        margin-top: 0.2rem;
     }
 
     .custom-info-box {
@@ -185,10 +131,17 @@ st.markdown("""
 
 # 4. App Header
 st.markdown("""
-    <div class="main-header">
-        <div class="header-tag">For {data_scientists}</div>
-        <div class="header-title">Poznań Rent Radar</div>
-        <div class="header-subtitle">A tool for data-driven rental estimations.</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+        <div>
+            <div style="color: #5c6ac4; font-family: monospace; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 1px;">Pricing Engine</div>
+            <div style="font-size: 2.4rem; font-weight: 700; color: #f8f8f2; margin-bottom: 0.2rem; letter-spacing: -0.5px;">Poznań Rent Radar</div>
+            <div style="font-size: 1.05rem; color: #a0a0ab; font-weight: 500;">Find the fair market rent for any apartment in seconds.</div>
+        </div>
+        <div style="margin-top: 0.5rem;">
+            <a href="https://github.com/Olat1337/poznan-rent-radar" target="_blank" style="color: #e4e4e7; text-decoration: none; font-weight: 600; font-size: 0.95rem; border: 1px solid #5c6ac4; padding: 10px 18px; border-radius: 8px; background-color: rgba(92, 106, 196, 0.1); transition: all 0.2s;">
+                🔗 GitHub Repo
+            </a>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -197,7 +150,7 @@ left_panel, right_panel = st.columns([1.2, 1], gap="medium")
 
 with left_panel:
     with st.container(border=True):
-        st.subheader("Apartment Attributes")
+        st.subheader("Apartment Details")
 
         row1_col1, row1_col2 = st.columns(2)
         with row1_col1:
@@ -209,14 +162,14 @@ with left_panel:
         with row2_col1:
             rooms_num = st.selectbox("Rooms", options=[1, 2, 3, 4, 5, 6, 7], index=1)
         with row2_col2:
-            location = st.selectbox("Location / District", options=[
+            location = st.selectbox("Neighborhood", options=[
                 "Jeżyce", "Stare Miasto", "Centrum", "Wilda", "Grunwald",
                 "Nowe Miasto", "Rataje", "Winogrady", "Łacina", "Naramowice",
                 "Piątkowo", "Świerczewo", "Junikowo", "Kasztelanów", "Podolany"
             ])
 
     with st.container(border=True):
-        st.subheader("Amenities & Features")
+        st.subheader("Amenities")
         col_c, col_d = st.columns(2)
         with col_c:
             has_ac = st.checkbox("Air Conditioning")
@@ -227,24 +180,24 @@ with left_panel:
             has_storage = st.checkbox("Storage Unit")
             is_secure = st.checkbox("Security / Surveillance")
 
-    calculate_clicked = st.button("Calculate Rent Estimate", use_container_width=True)
+    calculate_clicked = st.button("Calculate Estimated Rent", use_container_width=True)
 
 with right_panel:
     with st.container(border=True):
         st.subheader("Model Information")
         st.markdown(
-            "<span style='color: #a0a0ab; font-size: 0.95rem;'>This estimate uses current real estate data in Poznań.</span>",
+            "<span style='color: #a0a0ab; font-size: 0.95rem;'>This tool uses real market data to generate estimates.</span>",
             unsafe_allow_html=True)
         st.write("")
 
         kpi1, kpi2 = st.columns(2)
-        kpi1.metric(label="Model Margin of Error", value="± 337 PLN")
-        kpi2.metric(label="Dataset Status", value="Synchronized")
+        kpi1.metric(label="Average Error Margin", value="± 307 PLN")
+        kpi2.metric(label="Algorithm", value="CatBoost")
 
     if not calculate_clicked:
         st.markdown("""
             <div class="custom-info-box">
-                Fill out the apartment profile on the left and click <b>Calculate Rent Estimate</b> to display the value.
+                Fill out the apartment profile on the left and click <b>Calculate Estimated Rent</b> to see the fair market price.
             </div>
         """, unsafe_allow_html=True)
     else:
@@ -259,19 +212,37 @@ with right_panel:
         API_URL = f"{BACKEND_HOST}/predict"
 
         try:
-            with st.spinner("Processing data..."):
+            with st.spinner("Analyzing market data..."):
                 response = requests.post(API_URL, json=payload)
 
             if response.status_code == 200:
                 result = response.json()
                 predicted_rent = result.get("predicted_fair_rent_pln")
 
+                margin_of_error = 307
+                lower_bound = max(0, predicted_rent - margin_of_error)
+                upper_bound = predicted_rent + margin_of_error
+
                 st.markdown(f"""
-                    <div class="valuation-box">
-                        <p class="valuation-label">Estimated Market Value</p>
-                        <p class="valuation-price">{predicted_rent:,.0f} PLN</p>
-                        <p class="valuation-subtext">
-                            Average rent for this profile in <b>{location}</b>.
+                    <div style="background-color: #1e1e29; border: 1px solid #2d2d3d; border-radius: 10px; padding: 1.5rem; text-align: center; margin-top: 0.2rem;">
+                        <p style="font-size: 0.9rem; color: #a0a0ab; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Estimated Monthly Rent</p>
+                        <p style="font-size: 2.8rem; font-weight: 700; color: #f8f8f2; margin: 0.2rem 0;">{predicted_rent:,.0f} <span style="font-size: 1.2rem; color: #a0a0ab;">PLN</span></p>
+                        <div style="margin: 25px 10px 15px 10px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #a0a0ab; font-weight: 500; margin-bottom: 8px;">
+                                <span>{lower_bound:,.0f} PLN</span>
+                                <span>{upper_bound:,.0f} PLN</span>
+                            </div>
+                            <div style="display: flex; width: 100%; height: 14px; background-color: #16161e; border-radius: 7px; overflow: hidden; border: 1px solid #2d2d3d;">
+                                <div style="width: 49%; height: 100%; background: linear-gradient(90deg, #16161e, #5c6ac4);"></div>
+                                <div style="width: 2%; height: 100%; background-color: #ffffff;"></div>
+                                <div style="width: 49%; height: 100%; background: linear-gradient(90deg, #5c6ac4, #16161e);"></div>
+                            </div>
+                            <div style="text-align: center; font-size: 0.85rem; color: #6b6b7b; margin-top: 10px;">
+                                Expected Range (± 307 PLN Margin)
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #a0a0ab; line-height: 1.4; margin-top: 1rem; border-top: 1px solid #2d2d3d; padding-top: 1rem;">
+                            Based on current market trends for a {area} sqm apartment in <b>{location}</b>.
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
@@ -280,4 +251,4 @@ with right_panel:
                 st.error("Error processing the request. Please check your inputs.")
 
         except requests.exceptions.ConnectionError:
-            st.error("API Unreachable: Cannot connect to the local backend service.")
+            st.error("API Unreachable: Cannot connect to the backend server.")

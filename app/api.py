@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, "models", "poznan_rent_model.pkl")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "catboost_housing_model.pkl")
 FEATURES_PATH = os.path.join(BASE_DIR, "models", "model_features.pkl")
 
 model = None
