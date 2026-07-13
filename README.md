@@ -29,7 +29,7 @@ I split this application into a decoupled backend API and a frontend UI.
 ### Data Engineering & Modeling
 * **Stack:** Python, Pandas, NumPy, Scikit-Learn, CatBoost, Optuna.
 * **Why this stack:** Standard, well-documented tools for data cleaning and transformation. Optuna is fantastic for automated, highly efficient hyperparameter tuning.
-* **Why CatBoost:** After testing Random Forest, LightGBM, XGBoost, and a combined Voting Ensemble model, pure CatBoost achieved the best overall accuracy (lowest MAE) on this specific dataset without overfitting.
+* **Why CatBoost:** After benchmarking on log-transformed prices and testing Random Forest, LightGBM, XGBoost, and a combined Voting Ensemble model, pure CatBoost achieved the best overall accuracy (lowest MAE) on this specific dataset without overfitting.
 
 ### Web Frameworks & Deployment
 * **Backend:** FastAPI.
@@ -91,14 +91,19 @@ cd poznan-rent-radar
 pip install -r requirements.txt
 ```
 
-3. Start the Backend API
+3. If it's your first run, run parser.py
+```Bash
+python src/parser.py
+```
+
+4. Start the Backend API
 In your first terminal, start the FastAPI server:
 
 ```Bash
 uvicorn app.api:app --reload --port 8080
 ```
 
-4. Start the Frontend UI
+5. Start the Frontend UI
 Open a second terminal, set the local API URL environment variable, and start Streamlit:
 
 On Mac/Linux:
