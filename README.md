@@ -9,7 +9,7 @@ A machine learning project that estimates fair market rental prices for apartmen
 [![Optuna](https://img.shields.io/badge/Optuna-3.6+-blue.svg)](https://optuna.org/)
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.5+-F7931E.svg?logo=scikit-learn)](https://scikit-learn.org/)
 [![Pandas](https://img.shields.io/badge/pandas-2.2+-150458.svg?logo=pandas)](https://pandas.pydata.org/)
-[![NumPy](https://img.shields.io/badge/numpy-2.1+-013243.svg?logo=numpy)](https://numpy.org/)
+[![NumPy](https://img.shields.io/badge/numpy-2.1+-013243.svg?logo=numpy)](https://numpy.org/) 
 
 ## 🔗 Live Demo
 * **Frontend UI (Streamlit):** https://poznan-rent-radar-ui.up.railway.app
